@@ -75,6 +75,11 @@
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
             max-width: 600px;
             width: 100%;
+            /*
+             * MODIFIED: The box-sizing property has been moved to the media query.
+             * 変更点: box-sizingプロパティをメディアクエリ内に移動しました。
+             * これにより、PC表示では元のカード幅が完全に復元されます。
+            */
         }
 
         h1 {
@@ -127,6 +132,37 @@
             font-size: 0.8rem;
             color: #999;
         }
+
+        /*
+         * Responsive styles for smaller screens (e.g., smartphones)
+         * 小さい画面向けのレスポンシブ対応スタイル
+        */
+        @media (max-width: 768px) {
+            .content-wrapper {
+                /*
+                 * On smaller screens, adjust padding.
+                 * The side padding (15px) creates the margin you requested for the cards.
+                 * 左右のパディング(15px)が、ご要望のカードの「マージン」として機能します。
+                */
+                padding: 40px 15px;
+                gap: 25px;
+                /* Slightly reduce the space between cards */
+            }
+
+            .card {
+                /*
+                 * Adjust the card's internal padding for a better fit on small screens.
+                 * カード内部のパディングをスマホ画面に最適化します。
+                */
+                padding: 30px 25px;
+                /*
+                 * ADDED: Apply box-sizing only for small screens.
+                 * 追加: box-sizingをスマホ表示の時にだけ適用します。
+                 * これにより、width:100%でもpaddingがはみ出さず、レイアウトが崩れません。
+                */
+                box-sizing: border-box;
+            }
+        }
     </style>
 </head>
 
@@ -160,6 +196,7 @@
     </footer>
 
     <script>
+        // (JavaScript部分は変更ありません)
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
