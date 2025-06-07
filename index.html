@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rynskrmt</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto+Mono:wght@400&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+    <style>
+        :root {
+            --color-background: #f4f4f9;
+            --color-text: #333333;
+            --color-particle: #888888;
+            --color-card-bg: rgba(255, 255, 255, 0.9);
+            --color-hover: #007bff;
+            /* Accent color for hover effects */
+            --font-heading: 'Montserrat', sans-serif;
+            --font-body: 'Roboto Mono', monospace;
+        }
+
+        body {
+            background-color: var(--color-background);
+            color: var(--color-text);
+            font-family: var(--font-body);
+            margin: 0;
+            overflow-x: hidden;
+            /* Prevent horizontal scrollbars */
+        }
+
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Use main tag for the main content area */
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            /* Arrange cards vertically */
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 50px 20px;
+            /* Add vertical padding */
+            gap: 30px;
+            /* Space between cards */
+        }
+
+        .card {
+            background: var(--color-card-bg);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            padding: 40px 50px;
+            /* Adjusted padding */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(2rem, 8vw, 3rem);
+            margin: 0 0 15px 0;
+        }
+
+        h2 {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            margin: 0 0 25px 0;
+            color: #555;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0;
+            color: #555;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            /* Space between icons */
+        }
+
+        .social-links a {
+            color: var(--color-text);
+            font-size: 1.8rem;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--color-hover);
+            transform: translateY(-4px);
+            /* Slight lift effect on hover */
+        }
+
+        footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.8rem;
+            color: #999;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="particle-canvas"></canvas>
+
+    <main class="content-wrapper">
+        <div class="card">
+            <h1>rynskrmt</h1>
+            <p>準備中</p>
+        </div>
+
+        <div class="card">
+            <h2>Contact & Social</h2>
+            <div class="social-links">
+                <!-- Replace # with your actual links -->
+                <a href="mailto:rynskrmt@gmail.com" aria-label="Email" title="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://github.com/rynskrmt" target="_blank" rel="noopener noreferrer" aria-label="GitHub"
+                    title="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://x.com/rynskrmt" target="_blank" rel="noopener noreferrer"
+                    aria-label="X (formerly Twitter)" title="X (formerly Twitter)"><i class="fab fa-x-twitter"></i></a>
+                <a href="https://www.linkedin.com/in/liu0203/" target="_blank" rel="noopener noreferrer"
+                    aria-label="LinkedIn" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 rynskrmt. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particlesArray;
+        let lastScrollY = window.scrollY;
+        let scrollForce = 0; // The force applied by scrolling
+
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 2.5 + 1;
+                this.baseSpeed = 0.5;
+
+                // For chaotic, non-linear movement
+                this.angle = Math.random() * Math.PI * 2;
+                this.angleVelocity = (Math.random() - 0.5) * 0.02;
+
+                // For scroll interaction
+                this.scrollMultiplierX = (Math.random() - 0.5) * 2;
+                this.scrollMultiplierY = (Math.random() - 0.5) * 2;
+            }
+
+            draw() {
+                // Using the CSS variable for particle color for consistency
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-particle') + 'CC'; // Add some opacity
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            update() {
+                // [1] Organic Chaos Movement
+                this.angle += this.angleVelocity;
+                this.x += Math.cos(this.angle) * this.baseSpeed;
+                this.y += Math.sin(this.angle) * this.baseSpeed;
+
+                // [2] Apply Scroll Force
+                // Each particle reacts differently due to its unique multiplier
+                this.x += scrollForce * this.scrollMultiplierX;
+                this.y += scrollForce * this.scrollMultiplierY;
+
+                // Wall collision
+                if (this.x < 0 || this.x > canvas.width) this.x = (this.x + canvas.width) % canvas.width;
+                if (this.y < 0 || this.y > canvas.height) this.y = (this.y + canvas.height) % canvas.height;
+
+                this.draw();
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.width * canvas.height) / 8000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let x = Math.random() * canvas.width;
+                let y = Math.random() * canvas.height;
+                particlesArray.push(new Particle(x, y));
+            }
+        }
+
+        function connect() {
+            let maxDistance = 120;
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let dx = particlesArray[a].x - particlesArray[b].x;
+                    let dy = particlesArray[a].y - particlesArray[b].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < maxDistance) {
+                        let opacity = 1 - (distance / maxDistance);
+                        // Using the CSS variable for line color
+                        const lineColor = getComputedStyle(document.documentElement).getPropertyValue('--color-particle');
+                        ctx.strokeStyle = `rgba(${parseInt(lineColor.substr(1, 2), 16)}, ${parseInt(lineColor.substr(3, 2), 16)}, ${parseInt(lineColor.substr(5, 2), 16)}, ${opacity})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // --- SCROLL EVENT ---
+        window.addEventListener('scroll', () => {
+            const scrollDelta = window.scrollY - lastScrollY;
+            // The 'force' is proportional to how fast the user scrolls
+            scrollForce = scrollDelta * 0.2;
+            lastScrollY = window.scrollY;
+        });
+
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+            connect();
+
+            // Dampen the scroll force so the explosion effect fades out
+            scrollForce *= 0.95;
+
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        });
+
+        init();
+        animate();
+    </script>
+
+</body>
+
+</html>
